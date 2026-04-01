@@ -1,6 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.models import Topic, User, UserSettings
 from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
@@ -32,6 +33,7 @@ def register_user(db: Session, payload: RegisterRequest) -> TokenResponse:
         email=payload.email,
         password_hash=hash_password(payload.password),
         full_name=payload.full_name,
+        role="user",
         timezone=payload.timezone,
     )
     db.add(user)
@@ -46,3 +48,19 @@ def login_user(db: Session, payload: LoginRequest) -> TokenResponse:
     if not user or not verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     return TokenResponse(access_token=create_access_token(user.email))
+
+
+def seed_default_admin(db: Session) -> None:
+    if db.query(User).filter(User.email == settings.admin_email).first():
+        return
+    admin = User(
+        email=settings.admin_email,
+        password_hash=hash_password(settings.admin_password),
+        full_name=settings.admin_full_name,
+        role="admin",
+        timezone="UTC",
+    )
+    db.add(admin)
+    db.flush()
+    db.add(UserSettings(user_id=admin.id))
+    db.commit()

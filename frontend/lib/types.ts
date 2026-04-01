@@ -57,3 +57,19 @@ export type AudioPayload = {
   fallback_mode: string;
   script: string;
 };
+
+export type CurrentUser = {
+  email: string;
+  full_name: string;
+  role: string;
+  timezone: string;
+};
+
+export type AdminStatus = {
+  admin_email: string;
+  users: number;
+  articles: number;
+  events: number;
+  briefings: number;
+  mode: string;
+};

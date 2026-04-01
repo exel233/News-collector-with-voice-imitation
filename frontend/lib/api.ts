@@ -1,4 +1,4 @@
-import { AudioPayload, Briefing, Preferences, Topic, VoiceProfile } from "@/lib/types";
+import { AdminStatus, AudioPayload, Briefing, CurrentUser, Preferences, Topic, VoiceProfile } from "@/lib/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
 const BACKEND_ORIGIN = process.env.NEXT_PUBLIC_BACKEND_ORIGIN ?? "http://localhost:8000";
@@ -34,6 +34,10 @@ export async function register(payload: { email: string; password: string; full_
 
 export async function login(payload: { email: string; password: string }) {
   return request<{ access_token: string }>("/auth/login", { method: "POST", body: JSON.stringify(payload) });
+}
+
+export async function fetchCurrentUser() {
+  return request<CurrentUser>("/auth/me", {}, true);
 }
 
 export async function fetchPreferences() {
@@ -74,6 +78,10 @@ export async function fetchBriefingAudio(id: string) {
 
 export async function fetchVoiceProfile() {
   return request<VoiceProfile>("/voice", {}, true);
+}
+
+export async function fetchAdminStatus() {
+  return request<AdminStatus>("/status", {}, true);
 }
 
 export async function uploadVoiceSample(file: File) {

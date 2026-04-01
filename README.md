@@ -46,6 +46,28 @@ Production-style MVP for a personalized AI news briefing web app with a Next.js 
 4. Open `http://localhost:3000`.
 5. Create an account, choose topics, save a schedule, and click `Generate briefing now`.
 
+## Default Admin Account
+
+For local development, the backend seeds a default admin account on startup:
+
+- Email: `admin@example.com`
+- Password: `Admin123456!`
+
+You can override these with:
+
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+- `ADMIN_FULL_NAME`
+
+After signing in as admin, open `/admin` to view the dev status dashboard.
+
+If you already started the project with an older database schema before the admin role was added, rebuild with a fresh local database volume:
+
+```bash
+docker compose down -v
+docker compose up --build
+```
+
 ## What The MVP Includes
 
 - User sign up and sign in with JWT auth
@@ -86,6 +108,7 @@ Behavior:
 
 - `POST /api/auth/register`
 - `POST /api/auth/login`
+- `GET /api/auth/me`
 - `GET|PUT /api/preferences`
 - `GET|PUT /api/preferences/topics`
 - `GET|PUT /api/preferences/schedule`

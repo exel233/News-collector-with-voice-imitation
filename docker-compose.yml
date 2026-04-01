@@ -21,6 +21,9 @@ services:
       BACKEND_PUBLIC_URL: http://localhost:8000
       MEDIA_DIR: /app/media
       MOCK_NEWS_MODE: "true"
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: Admin123456!
+      ADMIN_FULL_NAME: Local Admin
     volumes:
       - ./backend:/app
       - backend_media:/app/media

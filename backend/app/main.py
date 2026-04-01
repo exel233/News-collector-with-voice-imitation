@@ -6,7 +6,7 @@ from app.core.config import settings
 from app.db.session import engine
 from app.models import base  # noqa: F401
 from app.db.session import SessionLocal
-from app.services.auth_service import seed_topics
+from app.services.auth_service import seed_default_admin, seed_topics
 from app.tasks.scheduler import configure_scheduler, shutdown_scheduler
 
 
@@ -34,6 +34,7 @@ def on_startup() -> None:
     db = SessionLocal()
     try:
         seed_topics(db)
+        seed_default_admin(db)
     finally:
         db.close()
     configure_scheduler()

@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     media_dir: str = str(BASE_DIR / "media")
     frontend_url: str = "http://localhost:3000"
     backend_public_url: str = "http://localhost:8000"
+    admin_email: str = "admin@example.com"
+    admin_password: str = "Admin123456!"
+    admin_full_name: str = "Local Admin"
 
 
 @lru_cache

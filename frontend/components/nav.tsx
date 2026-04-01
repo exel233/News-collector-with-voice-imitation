@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+
+import { fetchCurrentUser } from "@/lib/api";
 
 const links = [
   { href: "/dashboard", label: "Dashboard" },
@@ -13,10 +16,20 @@ const links = [
 export function Nav() {
   const pathname = usePathname();
   const router = useRouter();
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!window.localStorage.getItem("token")) return;
+    fetchCurrentUser()
+      .then((user) => setRole(user.role))
+      .catch(() => setRole(null));
+  }, []);
+
+  const allLinks = role === "admin" ? [...links, { href: "/admin", label: "Admin" }] : links;
 
   return (
     <nav className="mb-10 flex flex-wrap items-center gap-3">
-      {links.map((link) => (
+      {allLinks.map((link) => (
         <Link
           key={link.href}
           href={link.href}
