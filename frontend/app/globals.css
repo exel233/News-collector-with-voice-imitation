@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-paper text-ink font-body;
+  background-image:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.14), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(180, 83, 9, 0.12), transparent 30%);
+}
+
+.card {
+  @apply rounded-[28px] border border-black/5 bg-white/80 p-6 shadow-soft backdrop-blur;
+}
+
+.input {
+  @apply w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none focus:border-ocean;
+}
+
+.button-primary {
+  @apply rounded-full bg-ink px-5 py-3 text-sm font-semibold text-paper transition hover:opacity-90;
+}
+
+.button-secondary {
+  @apply rounded-full border border-ink/20 px-5 py-3 text-sm font-semibold text-ink transition hover:bg-white;
+}
