@@ -74,6 +74,7 @@ docker compose up --build
 - Topic selection and user preference storage
 - Daily schedule configuration
 - Mock news ingestion from multiple seeded stories
+- Live RSS news ingestion from BBC feeds with mock fallback when live fetch fails
 - Normalization, deduplication via normalized title hashing, event clustering, and weighted ranking
 - Briefing generation with:
   - Opening summary
@@ -127,6 +128,29 @@ Behavior:
 - TTS provider: [backend/app/services/providers/tts](/d:/CODE/code/forfun/News/backend/app/services/providers/tts)
 - Voice cloning provider: [backend/app/services/providers/voice_clone](/d:/CODE/code/forfun/News/backend/app/services/providers/voice_clone)
 
+## Current News Source Behavior
+
+- The backend now tries live RSS feeds first through [backend/app/services/providers/news/bbc_rss_provider.py](/d:/CODE/code/forfun/News/backend/app/services/providers/news/bbc_rss_provider.py)
+- If live RSS fetching fails, it falls back to mock data so local development still works
+- Toggle with:
+  - `LIVE_RSS_ENABLED=true|false`
+  - `MOCK_NEWS_MODE=true|false`
+
+## Open-Source Voice Cloning Candidates
+
+These are good next integrations for the guarded custom-voice path:
+
+- OpenVoice V2
+  - MIT-licensed
+  - Zero-shot voice cloning and multilingual support
+  - Official repo: https://github.com/myshell-ai/OpenVoice
+- Chatterbox
+  - MIT-licensed
+  - Zero-shot cloning with local model options and built-in watermarking
+  - Official repo: https://github.com/resemble-ai/chatterbox
+
+For this MVP, the project still defaults to standard TTS plus safe voice-sample storage, and does not synthesize cloned speech unless you plug in a provider behind the existing abstraction.
+
 ## Key Architecture Decisions
 
 - Frontend and backend are separated cleanly so the frontend can later be wrapped in Electron without changing backend contracts.
@@ -140,7 +164,7 @@ Behavior:
 - Clustering uses normalized-title hashing, which is simple and not semantic.
 - Auth is JWT-only and does not include refresh tokens, email verification, or password reset.
 - Scheduler runs in-process, so horizontal scaling would require an external scheduler or worker leader.
-- Mock ingestion is seeded data until a real provider is connected.
+- Live RSS is lightweight and keyless, but not as rich or controllable as a paid news API.
 - Voice cloning is a safe stub and does not produce cloned audio in the MVP.
 
 ## Next-Step Roadmap

@@ -1,4 +1,5 @@
 from datetime import datetime, time
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -18,7 +19,7 @@ class BriefingItemResponse(BaseModel):
 
 
 class BriefingResponse(BaseModel):
-    id: str
+    id: UUID
     title: str
     script: str
     audio_path: str | None

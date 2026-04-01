@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     ranking_novelty_weight: float = 0.10
     default_briefing_length_minutes: int = 6
     mock_news_mode: bool = True
+    live_rss_enabled: bool = True
     newsapi_key: str | None = None
     media_dir: str = str(BASE_DIR / "media")
     frontend_url: str = "http://localhost:3000"

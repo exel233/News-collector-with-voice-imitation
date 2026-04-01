@@ -34,7 +34,18 @@ def _calculate_recency(published_at: datetime) -> float:
 
 def ingest_articles(db: Session) -> list[SourceArticle]:
     created: list[SourceArticle] = []
-    for article in get_news_provider().fetch():
+    provider = get_news_provider()
+    try:
+        fetched_articles = provider.fetch()
+    except Exception:
+        fetched_articles = []
+
+    if not fetched_articles and settings.mock_news_mode:
+        from app.services.providers.news.mock_provider import MockNewsProvider
+
+        fetched_articles = MockNewsProvider().fetch()
+
+    for article in fetched_articles:
         existing = db.query(SourceArticle).filter(SourceArticle.url == article["url"]).first()
         if existing:
             created.append(existing)
@@ -51,7 +62,13 @@ def ingest_articles(db: Session) -> list[SourceArticle]:
 
 
 def cluster_articles(db: Session) -> list[NewsEvent]:
-    articles = db.query(SourceArticle).order_by(SourceArticle.published_at.desc()).all()
+    has_live_articles = db.query(SourceArticle).filter(~SourceArticle.url.like("https://example.com/%")).count() > 0
+    article_query = db.query(SourceArticle)
+    if has_live_articles:
+        article_query = article_query.filter(~SourceArticle.url.like("https://example.com/%"))
+    articles = article_query.order_by(SourceArticle.published_at.desc()).all()
+    db.query(NewsEvent).delete()
+    db.flush()
     clusters: dict[str, list[SourceArticle]] = defaultdict(list)
     for article in articles:
         clusters[article.normalized_hash[:24]].append(article)
@@ -59,10 +76,8 @@ def cluster_articles(db: Session) -> list[NewsEvent]:
     events: list[NewsEvent] = []
     for cluster_key, grouped in clusters.items():
         newest = sorted(grouped, key=lambda item: item.published_at, reverse=True)[0]
-        event = db.query(NewsEvent).filter(NewsEvent.cluster_key == cluster_key).first()
-        if not event:
-            event = NewsEvent(cluster_key=cluster_key)
-            db.add(event)
+        event = NewsEvent(cluster_key=cluster_key)
+        db.add(event)
         event.title = newest.title
         event.topic_slug = newest.topic_slug
         event.summary = newest.summary
